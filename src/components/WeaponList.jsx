@@ -11,7 +11,7 @@ export default function WeaponList() {
   useEffect(() => {
     const loadWeapons = async () => {
       try {
-        const data = await WeaponService.getAll();
+        const data = await WeaponService.getAll(); // From dev branch
         setWeapons(data);
       } catch (err) {
         setError(err.message);

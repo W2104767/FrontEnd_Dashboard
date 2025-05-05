@@ -1,56 +1,74 @@
 import apiClient from './apiClient';
 
 export const WeaponService = {
-  // Get all weapons
-  async getAllWeapons() {
+  // GET all weapons with optional category filter
+  getAll: async (categoryId = null) => {
     try {
-      const response = await apiClient.get('/weapons');
+      const params = categoryId ? { categoryId } : {};
+      const response = await apiClient.get('/weapons', { params });
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch weapons:', error);
-      throw new Error(error.response?.data?.message || 'Failed to load weapons');
+      throw new Error(error.response?.data || 'Failed to fetch weapons');
     }
   },
 
-  // Get weapon by ID
-  async getWeaponById(id) {
+  // GET weapon by ID with related data
+  getById: async (id) => {
     try {
-      const response = await apiClient.get(`/weapons/${id}`);
+      const response = await apiClient.get(`/weapons/${id}?includeRelated=true`);
       return response.data;
     } catch (error) {
-      console.error(`Failed to fetch weapon ${id}:`, error);
-      throw new Error(error.response?.data?.message || 'Weapon not found');
+      if (error.response?.status === 404) {
+        throw new Error('Weapon not found');
+      }
+      throw new Error('Failed to fetch weapon details');
     }
   },
 
-  // Add new weapon
-  async addWeapon(weapon) {
+  // CREATE weapon with validation
+  create: async (weaponData) => {
     try {
-      const response = await apiClient.post('/weapons', weapon);
+      const response = await apiClient.post('/weapons', weaponData);
       return response.data;
     } catch (error) {
-      console.error('Failed to add weapon:', error);
-      throw new Error(error.response?.data?.message || 'Failed to create weapon');
+      if (error.response?.status === 400) {
+        // Map backend validation errors to frontend format
+        const errors = error.response.data.errors || {};
+        throw new Error(
+          Object.entries(errors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('\n')
+        );
+      }
+      throw new Error('Failed to create weapon');
     }
   },
 
-  // Update existing weapon
-  async updateWeapon(id, weapon) {
+  // UPDATE weapon with partial data
+  update: async (id, weaponData) => {
     try {
-      await apiClient.put(`/weapons/${id}`, weapon);
+      const response = await apiClient.patch(`/weapons/${id}`, weaponData);
+      return response.data;
     } catch (error) {
-      console.error(`Failed to update weapon ${id}:`, error);
-      throw new Error(error.response?.data?.message || 'Failed to update weapon');
+      if (error.response?.status === 400) {
+        throw new Error('Invalid weapon data');
+      }
+      if (error.response?.status === 404) {
+        throw new Error('Weapon not found');
+      }
+      throw new Error('Failed to update weapon');
     }
   },
 
-  // Delete weapon
-  async deleteWeapon(id) {
+  // DELETE weapon
+  delete: async (id) => {
     try {
       await apiClient.delete(`/weapons/${id}`);
     } catch (error) {
-      console.error(`Failed to delete weapon ${id}:`, error);
-      throw new Error(error.response?.data?.message || 'Failed to delete weapon');
+      if (error.response?.status === 404) {
+        throw new Error('Weapon not found');
+      }
+      throw new Error('Failed to delete weapon');
     }
   }
 };

@@ -1,14 +1,13 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import Spinner from './Spinner';
 
-export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" replace />;
+export default function ProtectedRoute() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Spinner fullPage />; // Full-page spinner during auth check
+  }
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }
-
-<Routes>
-  <Route path="/dashboard" element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }/>
-</Routes>

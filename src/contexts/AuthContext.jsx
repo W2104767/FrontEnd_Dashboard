@@ -1,27 +1,52 @@
-import { createContext, useState, useContext } from 'react';
+import apiClient from './apiClient';
 
-// 1. Create context
-const AuthContext = createContext();
+export const AuthService = {
+  async login(email, password) {
+    try {
+      const response = await apiClient.post('/account/login', {
+        email,
+        password
+      });
+      
+      // Store the token (assuming JWT response)
+      localStorage.setItem('token', response.data.token);
+      
+      return response.data;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw new Error(
+        error.response?.data?.message || 
+        'Invalid email or password. Please try again.'
+      );
+    }
+  },
 
-// 2. Create provider component
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  async register(email, password) {
+    try {
+      const response = await apiClient.post('/account/register', {
+        email,
+        password
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw new Error(
+        error.response?.data?.message || 
+        'Registration failed. Please try again.'
+      );
+    }
+  },
 
-  // Login function (update state + call API)
-  const login = async (email, password) => {
-    const response = await fakeAuthAPI(email, password); // Replace with your API call
-    setUser(response.data.user);
-  };
+  logout() {
+    localStorage.removeItem('token');
+    // Redirect or perform other cleanup
+  },
 
-  const logout = () => setUser(null);
+  getCurrentToken() {
+    return localStorage.getItem('token');
+  },
 
-  // 3. Value exposed to consumers
-  const value = { user, login, logout };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-// 4. Custom hook for easy access
-export const useAuth = () => {
-  return useContext(AuthContext);
+  isAuthenticated() {
+    return !!this.getCurrentToken();
+  }
 };

@@ -1,16 +1,13 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-
-export default function Navbar() {
-  const { user, logout } = useAuth();
-
+export const Navbar = () => {
+  const { logout } = useAuth();
   return (
-    <nav>
-      {user ? (
-        <button onClick={logout}>Logout</button>
-      ) : (
-        <Link to="/login">Login</Link>
-      )}
+    <nav className="navbar bg-light">
+      <Link to="/">Home</Link>
+      <Link to="/weapons">Weapons</Link>
+      <button onClick={logout}>Logout</button>
     </nav>
   );
-}
+};

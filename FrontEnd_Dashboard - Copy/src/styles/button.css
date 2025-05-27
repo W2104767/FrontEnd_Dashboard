@@ -1,0 +1,12 @@
+.btn-primary {
+    background-color: #0d6efd;
+    color: white;
+  }
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }

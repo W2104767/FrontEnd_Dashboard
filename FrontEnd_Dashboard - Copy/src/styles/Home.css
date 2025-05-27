@@ -1,0 +1,26 @@
+
+
+.hero-section {
+    background-image: url('../utils/GunBanner.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh; 
+    color: white; 
+  }
+  
+  .featured-section .card {
+    margin-bottom: 30px;
+  }
+  
+  .categories-section .card {
+    margin-bottom: 30px;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+  }
+  
